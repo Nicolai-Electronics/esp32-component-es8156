@@ -180,3 +180,6 @@ esp_err_t es8156_write_eq_coefficient(es8156_handle_t handle, uint8_t address, u
 esp_err_t es8156_read_eq_coefficient(es8156_handle_t handle, uint8_t address, uint8_t* out_value);
 
 esp_err_t es8156_configure(es8156_handle_t handle);
+esp_err_t es8156_powerdown(es8156_handle_t handle);
+esp_err_t es8156_standby_nopop(es8156_handle_t handle);
+esp_err_t es8156_reset(es8156_handle_t handle);

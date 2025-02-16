@@ -66,6 +66,11 @@ static esp_err_t ts_i2c_master_transmit_receive(es8156_handle_t handle, const ui
 static esp_err_t ts_i2c_master_transmit(es8156_handle_t handle, const uint8_t* write_buffer, size_t write_size,
                                         int xfer_timeout_ms) {
     claim_i2c_bus(handle);
+    printf("Transmit: ");
+    for (uint8_t pos = 0; pos < write_size; pos++) {
+        printf("%02X ", write_buffer[pos]);
+    }
+    printf("\r\n");
     esp_err_t res = i2c_master_transmit(handle->dev_handle, write_buffer, write_size, xfer_timeout_ms);
     release_i2c_bus(handle);
     return res;
@@ -1351,4 +1356,77 @@ esp_err_t es8156_configure(es8156_handle_t handle) {
     ESP_LOGI(TAG, "Audio codec configured");
 
     return ESP_OK;
+}
+
+esp_err_t es8156_powerdown(es8156_handle_t handle) {
+    esp_err_t res = es8156_write_volume_control(handle, 0);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_eq_control_1(handle, false, true, false, false, 0);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_analog_system_3(handle, false, true, false);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_analog_system_6(handle, true, false, false, false, 0, false, true);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_misc_control_3(handle, true, false, false, false, false, false, false);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_misc_control_2(handle, false, true, false, false);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_misc_control_2(handle, true, false, false, false);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_clock_off(handle, false, false, false, false, false, false);
+    if (res != ESP_OK) {
+        return res;
+    }
+    vTaskDelay(pdMS_TO_TICKS(500));
+    return es8156_write_analog_system_6(handle, true, true, true, false, 0, false, true);
+}
+
+esp_err_t es8156_standby_nopop(es8156_handle_t handle) {
+    esp_err_t res = es8156_write_volume_control(handle, 0);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_eq_control_1(handle, false, true, false, false, 0);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_analog_system_6(handle, true, false, false, false, 2, false, true);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_misc_control_3(handle, true, false, false, false, false, false, false);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_misc_control_2(handle, false, true, false, false);
+    if (res != ESP_OK) {
+        return res;
+    }
+    res = es8156_write_misc_control_2(handle, true, false, false, false);
+    if (res != ESP_OK) {
+        return res;
+    }
+    return es8156_write_clock_off(handle, false, false, false, false, false, false);
+}
+
+esp_err_t es8156_reset(es8156_handle_t handle) {
+    esp_err_t res = es8156_write_reset_control(handle, false, false, true, true, true, false);
+    if (res != ESP_OK) {
+        return res;
+    }
+    return es8156_write_reset_control(handle, true, false, false, false, false, false);
 }
