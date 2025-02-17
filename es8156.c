@@ -66,11 +66,6 @@ static esp_err_t ts_i2c_master_transmit_receive(es8156_handle_t handle, const ui
 static esp_err_t ts_i2c_master_transmit(es8156_handle_t handle, const uint8_t* write_buffer, size_t write_size,
                                         int xfer_timeout_ms) {
     claim_i2c_bus(handle);
-    printf("Transmit: ");
-    for (uint8_t pos = 0; pos < write_size; pos++) {
-        printf("%02X ", write_buffer[pos]);
-    }
-    printf("\r\n");
     esp_err_t res = i2c_master_transmit(handle->dev_handle, write_buffer, write_size, xfer_timeout_ms);
     release_i2c_bus(handle);
     return res;
