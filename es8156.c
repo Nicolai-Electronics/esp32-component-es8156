@@ -42,8 +42,6 @@ static void claim_i2c_bus(es8156_handle_t handle) {
     // Claim I2C bus
     if (handle->configuration.concurrency_semaphore != NULL) {
         xSemaphoreTake(handle->configuration.concurrency_semaphore, portMAX_DELAY);
-    } else {
-        ESP_LOGW(TAG, "No concurrency semaphore");
     }
 }
 
@@ -1347,8 +1345,6 @@ esp_err_t es8156_configure(es8156_handle_t handle) {
 
     res = es8156_write_volume_control(handle, 100);
     if (res != ESP_OK) return res;
-
-    ESP_LOGI(TAG, "Audio codec configured");
 
     return ESP_OK;
 }
